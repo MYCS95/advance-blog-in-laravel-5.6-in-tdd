@@ -8,12 +8,18 @@ use App\Post;
 
 class PostsController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth')->only('store');
+    }
+    
     /**
      * Retrieve all blog post
      *
      */
 
-    public function index(Post $post) { // We inject post model
+    public function index(Post $post)
+    { // We inject post model
 
         // Retrieve all posts sort by created_at desc
         $posts = $post::latest()->get();
@@ -27,4 +33,14 @@ class PostsController extends Controller
         return view('post.show')->with(['post' => $post]);
     }
 
+    public function store(Request $request)
+    {
+        $post = Post::create([
+            'user_id' => auth()->id(),
+            'title' => $request->title,
+            'body' => $request->body
+        ]);
+
+        return redirect('/blog/'.$post->id);
+    }
 }
